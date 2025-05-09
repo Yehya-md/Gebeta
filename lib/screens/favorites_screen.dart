@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'recipes_screen.dart';
 import 'contribution_screen.dart';
-import 'package:food_recipe/screens/profile_screen.dart' as ProfileScreen;
+import 'about_screen.dart'; // Import the new AboutScreen
 
 class FavoritesScreen extends StatefulWidget {
   final Set<String> favorites;
   final List<dynamic> allRecipes;
-  final void Function(String?)? onToggleFavorite; // Updated to match type
+  final void Function(String?)? onToggleFavorite;
 
   const FavoritesScreen({
     super.key,
@@ -76,8 +76,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     } else if (index == 4) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => const ProfileScreen.ProfileScreen()),
+        MaterialPageRoute(builder: (context) => const AboutScreen()),
       );
     }
   }
@@ -187,8 +186,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
+            icon: Icon(Icons.info, size: 24), // Icon for About
+            label: 'About',
           ),
         ],
         currentIndex: _selectedIndex,

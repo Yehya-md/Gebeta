@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'about_screen.dart';
 import 'home_screen.dart';
 import 'recipes_screen.dart';
 import 'favorites_screen.dart';
@@ -47,7 +48,7 @@ class _ContributionScreenState extends State<ContributionScreen> {
     } else if (index == 4) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        MaterialPageRoute(builder: (context) => const AboutScreen()),
       );
     }
   }
@@ -212,8 +213,8 @@ class _ContributionScreenState extends State<ContributionScreen> {
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
+            icon: Icon(Icons.info, size: 24),
+            label: 'About',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -233,23 +234,6 @@ class _ContributionScreenState extends State<ContributionScreen> {
           elevation: 4.0,
           shape: const CircleBorder(),
         ),
-      ),
-    );
-  }
-}
-
-// Placeholder for ProfileScreen
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: const Center(
-        child: Text('Profile Screen Placeholder'),
       ),
     );
   }

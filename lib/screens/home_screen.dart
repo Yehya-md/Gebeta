@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'about_screen.dart';
 import 'recipes_screen.dart';
 import 'recipe_details_screen.dart';
 import 'favorites_screen.dart';
 import 'contribution_screen.dart';
-import 'package:food_recipe/screens/profile_screen.dart' as ProfileScreen;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -185,8 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (index == 4) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => const ProfileScreen.ProfileScreen()),
+        MaterialPageRoute(builder: (context) => const AboutScreen()),
       );
     }
   }
@@ -745,8 +744,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
+            icon: Icon(Icons.info, size: 24),
+            label: 'About',
           ),
         ],
         currentIndex: _selectedIndex,

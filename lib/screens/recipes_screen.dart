@@ -3,10 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../widgets/filter_dropdown.dart';
 import '../widgets/recipe_card.dart';
+import 'about_screen.dart';
 import 'home_screen.dart';
 import 'favorites_screen.dart';
 import 'contribution_screen.dart';
-import 'feedback_screen.dart';
 
 class RecipesScreen extends StatefulWidget {
   final String? initialCategory;
@@ -345,7 +345,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
     } else if (index == 4) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        MaterialPageRoute(builder: (context) => const AboutScreen()),
       );
     }
   }
@@ -539,8 +539,8 @@ class _RecipesScreenState extends State<RecipesScreen> {
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
+            icon: Icon(Icons.info, size: 24),
+            label: 'About',
           ),
         ],
         currentIndex: _selectedIndex,
