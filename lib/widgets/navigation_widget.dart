@@ -35,15 +35,17 @@ class NavigationWidget extends StatelessWidget {
             });
         break;
       case 4:
-        AppRouter.navigateTo(context, AppRouter.about, replace: true);
+        AppRouter.navigateTo(
+            context, showProfile ? AppRouter.about : AppRouter.about,
+            replace: true);
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Stack(
+      alignment: Alignment.bottomCenter,
       children: [
         BottomNavigationBar(
           items: [
@@ -64,18 +66,18 @@ class NavigationWidget extends StatelessWidget {
               label: 'Favorites',
             ),
             BottomNavigationBarItem(
-              icon: Icon(showProfile ? Icons.person : Icons.info,
-                  size: AppConstants.iconSize),
-              label: showProfile ? 'Profile' : 'About',
+              icon: Icon(Icons.info, size: AppConstants.iconSize),
+              label: 'About',
             ),
           ],
           currentIndex: currentIndex,
           selectedItemColor: AppConstants.primaryColor,
           unselectedItemColor: AppConstants.grey,
           onTap: (index) => _onItemTapped(context, index),
+          type: BottomNavigationBarType.fixed,
         ),
-        Container(
-          margin: AppConstants.fabMargin,
+        Padding(
+          padding: const EdgeInsets.only(top: 10.0), // Adjust FAB position
           child: FloatingActionButton(
             onPressed: () {
               AppRouter.navigateTo(context, AppRouter.contribution,
@@ -84,7 +86,7 @@ class NavigationWidget extends StatelessWidget {
             backgroundColor: AppConstants.primaryColor,
             child: Icon(Icons.add,
                 size: AppConstants.fabIconSize, color: AppConstants.white),
-            elevation: 4.0,
+            elevation: 6.0,
             shape: const CircleBorder(),
           ),
         ),

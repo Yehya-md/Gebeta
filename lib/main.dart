@@ -12,6 +12,7 @@ class GebetaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Gebeta App',
+      debugShowCheckedModeBanner: false, // Disable debug banner
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.grey[100],

@@ -10,10 +10,12 @@ class FooterWidget extends StatelessWidget {
       padding: AppConstants.defaultPadding,
       color: AppConstants.grey[200],
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Center text
         children: [
           Text(
             'Gebeta © 2025.',
             style: AppConstants.bodyText2,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
         ],

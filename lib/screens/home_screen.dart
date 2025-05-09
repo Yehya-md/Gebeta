@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/constants.dart';
 import '../routes/router.dart';
 import '../services/meal_api_service.dart';
+import '../state/favorites_state.dart'; // New state file
 import '../widgets/footer_widget.dart';
 import '../widgets/navigation_widget.dart';
 
@@ -18,12 +19,22 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> topMealsByCountry = [];
   List<dynamic> topMealsByCategory = [];
   List<String> categories = [];
-  final Set<String> favorites = {};
 
   @override
   void initState() {
     super.initState();
     _fetchData();
+    FavoritesState().addListener(_onFavoritesChanged);
+  }
+
+  @override
+  void dispose() {
+    FavoritesState().removeListener(_onFavoritesChanged);
+    super.dispose();
+  }
+
+  void _onFavoritesChanged() {
+    setState(() {}); // Refresh UI when favorites change
   }
 
   Future<void> _fetchData() async {
@@ -62,13 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void toggleFavorite(String? recipeId) {
     if (recipeId != null) {
-      setState(() {
-        if (favorites.contains(recipeId)) {
-          favorites.remove(recipeId);
-        } else {
-          favorites.add(recipeId);
-        }
-      });
+      FavoritesState().toggleFavorite(recipeId);
     }
   }
 
@@ -91,16 +96,19 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center, // Center content
               children: [
                 Container(
                   padding: AppConstants.defaultPadding,
                   color: AppConstants.white,
                   child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center greeting
                     children: [
                       Text(
                         '${_getGreeting()}!',
                         style: AppConstants.headline1,
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -190,7 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: recipes.length,
                     itemBuilder: (context, index) {
                       final recipe = recipes[index];
-                      final isFav = favorites.contains(recipe['idMeal']);
+                      final isFav =
+                          FavoritesState().favorites.contains(recipe['idMeal']);
                       return GestureDetector(
                         onTap: () {
                           AppRouter.navigateTo(
