@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../screens/recipe_details_screen.dart';
+import '../../constants/constants.dart';
+import '../../routes/router.dart';
 
 class RecipeCard extends StatelessWidget {
   final dynamic recipe;
@@ -18,22 +19,18 @@ class RecipeCard extends StatelessWidget {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+      shape:
+          RoundedRectangleBorder(borderRadius: AppConstants.cardBorderRadius),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RecipeDetailsScreen(
-                recipe: recipe,
-                isFavorite: isFavorite,
-                onFavoriteToggle: () =>
-                    onToggleFavorite(recipe['idMeal'] as String?),
-              ),
-            ),
-          );
+          AppRouter.navigateTo(context, AppRouter.recipeDetails, arguments: {
+            'recipe': recipe,
+            'isFavorite': isFavorite,
+            'onFavoriteToggle': () =>
+                onToggleFavorite(recipe['idMeal'] as String?),
+          });
         },
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: AppConstants.cardBorderRadius,
         child: Container(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -45,8 +42,10 @@ class RecipeCard extends StatelessWidget {
                   width: 100,
                   height: 100,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error, color: Colors.red),
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.error,
+                    color: AppConstants.errorColor,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -56,31 +55,31 @@ class RecipeCard extends StatelessWidget {
                   children: [
                     Text(
                       recipe['strMeal'] ?? 'Unnamed',
-                      style: const TextStyle(
+                      style: AppConstants.headline3.copyWith(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4B0082),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'From ${recipe['strArea'] ?? 'Unknown'}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: AppConstants.bodyText2,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       recipe['strCategory'] ?? 'Unknown',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
+                      style: AppConstants.bodyText2.copyWith(
                         fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? AppConstants.favoriteColor : null,
+                ),
+                onPressed: () => onToggleFavorite(recipe['idMeal'] as String?),
               ),
             ],
           ),

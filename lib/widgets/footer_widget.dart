@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/constants.dart';
 
 class FooterWidget extends StatelessWidget {
   const FooterWidget({super.key});
@@ -6,13 +7,13 @@ class FooterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
-      color: Colors.grey[200],
+      padding: AppConstants.defaultPadding,
+      color: AppConstants.grey[200],
       child: Column(
         children: [
           Text(
             'Gebeta © 2025.',
-            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            style: AppConstants.bodyText2,
           ),
           const SizedBox(height: 8),
         ],

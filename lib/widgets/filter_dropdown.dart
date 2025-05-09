@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/constants.dart';
 
 class FilterDropdown extends StatelessWidget {
   final String value;
@@ -24,32 +25,32 @@ class FilterDropdown extends StatelessWidget {
           value: item,
           child: Text(
             item,
-            style: const TextStyle(fontSize: 14),
+            style: AppConstants.bodyText1.copyWith(fontSize: 14),
             overflow: TextOverflow.ellipsis,
           ),
         );
       }).toList(),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF4B0082)),
+        labelStyle: TextStyle(color: AppConstants.primaryColor),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppConstants.white,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: AppConstants.buttonBorderRadius,
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFF4B0082), width: 1),
+          borderRadius: AppConstants.buttonBorderRadius,
+          borderSide: BorderSide(color: AppConstants.primaryColor, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFF4B0082), width: 2),
+          borderRadius: AppConstants.buttonBorderRadius,
+          borderSide: BorderSide(color: AppConstants.primaryColor, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       isExpanded: true,
-      icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF4B0082)),
+      icon: Icon(Icons.arrow_drop_down, color: AppConstants.primaryColor),
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'recipes_screen.dart';
-import 'favorites_screen.dart';
-import 'contribution_screen.dart';
+import '../constants/constants.dart';
+import '../widgets/navigation_widget.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -15,45 +13,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
   final _feedbackController = TextEditingController();
   int _rating = 0;
-  int _selectedIndex = 0; // Default to Home tab
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const RecipesScreen()),
-      );
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ContributionScreen()),
-      );
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FavoritesScreen(
-            favorites: const {},
-            allRecipes: const [],
-            onToggleFavorite: (id) {},
-          ),
-        ),
-      );
-    } else if (index == 4) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
-      );
-    }
-  }
 
   @override
   void dispose() {
@@ -88,38 +47,30 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Give Feedback'),
-        backgroundColor: Colors.white,
+        backgroundColor: AppConstants.white,
         elevation: 0,
-        titleTextStyle: const TextStyle(
-          color: Color(0xFF2E3192),
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
+        titleTextStyle: AppConstants.headline2,
       ),
       body: Container(
-        color: Colors.grey[100],
-        padding: const EdgeInsets.all(16.0),
+        color: AppConstants.backgroundColor,
+        padding: AppConstants.defaultPadding,
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'We value your feedback! Let us know how we can improve.',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.grey,
+                    color: AppConstants.grey,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Rate your experience:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2E3192),
-                  ),
+                  style: AppConstants.headline3,
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -142,13 +93,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   controller: _feedbackController,
                   decoration: InputDecoration(
                     labelText: 'Your Feedback',
-                    labelStyle: const TextStyle(color: Color(0xFF2E3192)),
+                    labelStyle: TextStyle(color: AppConstants.primaryColor),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: AppConstants.cardBorderRadius,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFF2E3192)),
+                      borderRadius: AppConstants.cardBorderRadius,
+                      borderSide: BorderSide(color: AppConstants.primaryColor),
                     ),
                   ),
                   maxLines: 5,
@@ -164,17 +115,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   child: ElevatedButton(
                     onPressed: _submitFeedback,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E3192),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 12),
+                      backgroundColor: AppConstants.primaryColor,
+                      foregroundColor: AppConstants.white,
+                      padding: AppConstants.buttonPadding,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: AppConstants.buttonBorderRadius,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Submit Feedback',
-                      style: TextStyle(fontSize: 16),
+                      style: AppConstants.buttonText,
                     ),
                   ),
                 ),
@@ -183,65 +133,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 24),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_dining, size: 24),
-            label: 'Recipes',
-          ),
-          BottomNavigationBarItem(
-            icon: const SizedBox
-                .shrink(), // Placeholder for custom Contribute icon
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, size: 24),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF2E3192),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            _onItemTapped(2);
-          },
-          backgroundColor: const Color(0xFF2E3192),
-          child: const Icon(Icons.add, size: 36, color: Colors.white),
-          elevation: 4.0,
-          shape: const CircleBorder(),
-        ),
-      ),
-    );
-  }
-}
-
-// Placeholder for ProfileScreen
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: const Center(
-        child: Text('Profile Screen Placeholder'),
-      ),
+      bottomNavigationBar: const NavigationWidget(currentIndex: 4),
     );
   }
 }

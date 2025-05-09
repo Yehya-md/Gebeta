@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'about_screen.dart';
-import 'home_screen.dart';
-import 'recipes_screen.dart';
-import 'favorites_screen.dart';
-import 'contribution_screen.dart';
+import '../constants/constants.dart';
+import '../widgets/navigation_widget.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
   final dynamic recipe;
@@ -22,58 +19,19 @@ class RecipeDetailsScreen extends StatefulWidget {
 }
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
-  late bool _isFavorite; // Local state for favorite status
-  int _selectedIndex = 0; // Default to Home tab
+  late bool _isFavorite;
 
   @override
   void initState() {
     super.initState();
-    _isFavorite = widget.isFavorite; // Initialize with the passed value
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const RecipesScreen()),
-      );
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ContributionScreen()),
-      );
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FavoritesScreen(
-            favorites: const {},
-            allRecipes: [widget.recipe],
-            onToggleFavorite: (id) => widget.onFavoriteToggle(),
-          ),
-        ),
-      );
-    } else if (index == 4) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AboutScreen()),
-      );
-    }
+    _isFavorite = widget.isFavorite;
   }
 
   void _toggleFavorite() {
     setState(() {
-      _isFavorite = !_isFavorite; // Toggle local state
+      _isFavorite = !_isFavorite;
     });
-    widget.onFavoriteToggle(); // Notify parent to update its state
+    widget.onFavoriteToggle();
   }
 
   @override
@@ -92,7 +50,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
 
     return Scaffold(
       body: Container(
-        color: Colors.grey[100],
+        color: AppConstants.backgroundColor,
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -105,9 +63,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       height: 250,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
+                      errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.error,
-                        color: Colors.red,
+                        color: AppConstants.errorColor,
                         size: 250,
                       ),
                     ),
@@ -115,7 +73,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       top: 16,
                       left: 16,
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: Icon(Icons.arrow_back, color: AppConstants.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
@@ -125,7 +83,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       child: IconButton(
                         icon: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorite ? Colors.red : Colors.white,
+                          color: _isFavorite
+                              ? AppConstants.favoriteColor
+                              : AppConstants.white,
                         ),
                         onPressed: _toggleFavorite,
                       ),
@@ -133,105 +93,80 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: AppConstants.defaultPadding,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.recipe['strMeal'] ?? 'Unnamed Recipe',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E3192),
-                        ),
+                        style: AppConstants.headline2,
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           Text(
                             widget.recipe['strCategory'] ?? 'Unknown',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
+                            style: AppConstants.bodyText2,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '•',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
+                            style: AppConstants.bodyText2,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             widget.recipe['strArea'] ?? 'Unknown',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
+                            style: AppConstants.bodyText2,
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Ingredients',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E3192),
-                        ),
+                        style: AppConstants.headline3,
                       ),
                       const SizedBox(height: 8),
                       ...ingredients.map((ingredient) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.check_circle,
-                                  color: Color(0xFF2E3192),
+                                  color: AppConstants.primaryColor,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     ingredient,
-                                    style: const TextStyle(fontSize: 16),
+                                    style: AppConstants.bodyText1,
                                   ),
                                 ),
                               ],
                             ),
                           )),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Instructions',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E3192),
-                        ),
+                        style: AppConstants.headline3,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         widget.recipe['strInstructions'] ??
                             'No instructions available.',
-                        style: const TextStyle(fontSize: 16, height: 1.5),
+                        style: AppConstants.bodyText1,
                       ),
                       const SizedBox(height: 16),
                       if (widget.recipe['strCulturalInfo'] != null &&
                           widget.recipe['strCulturalInfo'].isNotEmpty) ...[
-                        const Text(
+                        Text(
                           'Cultural Info',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2E3192),
-                          ),
+                          style: AppConstants.headline3,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           widget.recipe['strCulturalInfo'],
-                          style: const TextStyle(fontSize: 16, height: 1.5),
+                          style: AppConstants.bodyText1,
                         ),
                       ],
                     ],
@@ -242,48 +177,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 24),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_dining, size: 24),
-            label: 'Recipes',
-          ),
-          BottomNavigationBarItem(
-            icon: const SizedBox
-                .shrink(), // Placeholder for custom Contribute icon
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, size: 24),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info, size: 24),
-            label: 'About',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF2E3192),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            _onItemTapped(2);
-          },
-          backgroundColor: const Color(0xFF2E3192),
-          child: const Icon(Icons.add, size: 36, color: Colors.white),
-          elevation: 4.0,
-          shape: const CircleBorder(),
-        ),
-      ),
+      bottomNavigationBar: const NavigationWidget(currentIndex: 0),
     );
   }
 }

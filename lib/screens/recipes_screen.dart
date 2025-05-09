@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../constants/constants.dart';
+import '../services/meal_api_service.dart';
 import '../widgets/filter_dropdown.dart';
+import '../widgets/navigation_widget.dart';
 import '../widgets/recipe_card.dart';
-import 'about_screen.dart';
-import 'home_screen.dart';
-import 'favorites_screen.dart';
-import 'contribution_screen.dart';
 
 class RecipesScreen extends StatefulWidget {
   final String? initialCategory;
@@ -32,7 +29,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
   String selectedCategory = 'All';
   String selectedArea = 'All';
   String selectedSort = 'Name (A-Z)';
-  int _selectedIndex = 1; // Recipes tab is selected by default
 
   @override
   void initState() {
@@ -43,8 +39,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
     if (widget.initialArea != null) {
       selectedArea = widget.initialArea!;
     }
-    fetchCategoriesAndAreas();
-    fetchAllRecipes();
+    _fetchInitialData();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
@@ -54,34 +49,19 @@ class _RecipesScreenState extends State<RecipesScreen> {
     });
   }
 
-  Future<void> fetchCategoriesAndAreas() async {
-    try {
-      final categoryResponse = await http.get(
-          Uri.parse('https://www.themealdb.com/api/json/v1/1/list.php?c=list'));
-      if (categoryResponse.statusCode == 200) {
-        final categoryData = jsonDecode(categoryResponse.body);
-        categories = [
-          'All',
-          ...categoryData['meals']
-              .map((c) => c['strCategory'] as String)
-              .toList()
-        ];
-      }
+  Future<void> _fetchInitialData() async {
+    final apiService = MealApiService();
+    final results = await Future.wait([
+      apiService.fetchCategories(),
+      apiService.fetchAreas(),
+    ]);
 
-      final areaResponse = await http.get(
-          Uri.parse('https://www.themealdb.com/api/json/v1/1/list.php?a=list'));
-      if (areaResponse.statusCode == 200) {
-        final areaData = jsonDecode(areaResponse.body);
-        areas = [
-          'All',
-          ...areaData['meals'].map((a) => a['strArea'] as String).toList()
-        ];
-      }
+    setState(() {
+      categories = ['All', ...results[0]];
+      areas = ['All', ...results[1]];
+    });
 
-      setState(() {});
-    } catch (e) {
-      print('Error fetching categories/areas: $e');
-    }
+    await fetchAllRecipes();
   }
 
   Future<void> fetchAllRecipes() async {
@@ -91,45 +71,12 @@ class _RecipesScreenState extends State<RecipesScreen> {
       searchResults.clear();
     });
 
+    final apiService = MealApiService();
     try {
       if (selectedArea != 'All') {
-        final response = await http.get(Uri.parse(
-            'https://www.themealdb.com/api/json/v1/1/filter.php?a=$selectedArea'));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          List<dynamic> areaRecipes =
-              data['meals']?.where((meal) => meal != null).toList() ?? [];
-          for (var meal in areaRecipes) {
-            final detailResponse = await http.get(Uri.parse(
-                'https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal['idMeal']}'));
-            if (detailResponse.statusCode == 200) {
-              final detailData = jsonDecode(detailResponse.body);
-              if (detailData['meals'] != null &&
-                  detailData['meals'].isNotEmpty) {
-                recipes.add(detailData['meals'][0]);
-              }
-            }
-          }
-        }
+        recipes = await apiService.fetchRecipesByArea(selectedArea);
       } else if (selectedCategory != 'All') {
-        final response = await http.get(Uri.parse(
-            'https://www.themealdb.com/api/json/v1/1/filter.php?c=$selectedCategory'));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          List<dynamic> categoryRecipes =
-              data['meals']?.where((meal) => meal != null).toList() ?? [];
-          for (var meal in categoryRecipes) {
-            final detailResponse = await http.get(Uri.parse(
-                'https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal['idMeal']}'));
-            if (detailResponse.statusCode == 200) {
-              final detailData = jsonDecode(detailResponse.body);
-              if (detailData['meals'] != null &&
-                  detailData['meals'].isNotEmpty) {
-                recipes.add(detailData['meals'][0]);
-              }
-            }
-          }
-        }
+        recipes = await apiService.fetchRecipesByCategory(selectedCategory);
       }
 
       if (recipes.isEmpty) {
@@ -138,47 +85,14 @@ class _RecipesScreenState extends State<RecipesScreen> {
             i < initialAreasToFetch && currentAreaIndex < areas.length - 1;
             i++) {
           String area = areas[currentAreaIndex + 1];
-          final response = await http.get(Uri.parse(
-              'https://www.themealdb.com/api/json/v1/1/filter.php?a=$area'));
-          if (response.statusCode == 200) {
-            final data = jsonDecode(response.body);
-            List<dynamic> areaRecipes =
-                data['meals']?.where((meal) => meal != null).toList() ?? [];
-            for (var meal in areaRecipes) {
-              final detailResponse = await http.get(Uri.parse(
-                  'https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal['idMeal']}'));
-              if (detailResponse.statusCode == 200) {
-                final detailData = jsonDecode(detailResponse.body);
-                if (detailData['meals'] != null &&
-                    detailData['meals'].isNotEmpty) {
-                  recipes.add(detailData['meals'][0]);
-                }
-              }
-            }
-          }
+          final areaRecipes = await apiService.fetchRecipesByArea(area);
+          recipes.addAll(areaRecipes);
           currentAreaIndex++;
         }
       }
 
       if (recipes.isEmpty) {
-        final fallbackResponse = await http.get(Uri.parse(
-            'https://www.themealdb.com/api/json/v1/1/search.php?f=a'));
-        if (fallbackResponse.statusCode == 200) {
-          final data = jsonDecode(fallbackResponse.body);
-          List<dynamic> fallbackRecipes =
-              data['meals']?.where((meal) => meal != null).toList() ?? [];
-          for (var meal in fallbackRecipes) {
-            final detailResponse = await http.get(Uri.parse(
-                'https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal['idMeal']}'));
-            if (detailResponse.statusCode == 200) {
-              final detailData = jsonDecode(detailResponse.body);
-              if (detailData['meals'] != null &&
-                  detailData['meals'].isNotEmpty) {
-                recipes.add(detailData['meals'][0]);
-              }
-            }
-          }
-        }
+        recipes = await apiService.fetchFallbackRecipes();
       }
 
       applyFiltersAndSort();
@@ -205,36 +119,16 @@ class _RecipesScreenState extends State<RecipesScreen> {
       isLoadingMore = true;
     });
 
+    final apiService = MealApiService();
     try {
       String area = areas[currentAreaIndex + 1];
-      final response = await http.get(Uri.parse(
-          'https://www.themealdb.com/api/json/v1/1/filter.php?a=$area'));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        List<dynamic> areaRecipes =
-            data['meals']?.where((meal) => meal != null).toList() ?? [];
-        for (var meal in areaRecipes) {
-          final detailResponse = await http.get(Uri.parse(
-              'https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal['idMeal']}'));
-          if (detailResponse.statusCode == 200) {
-            final detailData = jsonDecode(detailResponse.body);
-            if (detailData['meals'] != null && detailData['meals'].isNotEmpty) {
-              recipes.add(detailData['meals'][0]);
-            }
-          }
-        }
+      final areaRecipes = await apiService.fetchRecipesByArea(area);
+      setState(() {
+        recipes.addAll(areaRecipes);
         currentAreaIndex++;
         applyFiltersAndSort();
-        setState(() {
-          isLoadingMore = false;
-        });
-      } else {
-        print(
-            'Failed to load recipes for area $area, status: ${response.statusCode}');
-        setState(() {
-          isLoadingMore = false;
-        });
-      }
+        isLoadingMore = false;
+      });
     } catch (e) {
       print('Error fetching more recipes: $e');
       setState(() {
@@ -315,41 +209,6 @@ class _RecipesScreenState extends State<RecipesScreen> {
     }
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (index == 1) {
-      // Already on RecipesScreen, do nothing
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ContributionScreen()),
-      );
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FavoritesScreen(
-            favorites: favorites,
-            allRecipes: recipes,
-            onToggleFavorite: toggleFavorite,
-          ),
-        ),
-      );
-    } else if (index == 4) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AboutScreen()),
-      );
-    }
-  }
-
   @override
   void dispose() {
     _scrollController.dispose();
@@ -361,38 +220,34 @@ class _RecipesScreenState extends State<RecipesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.grey[100],
+        color: AppConstants.backgroundColor,
         child: SafeArea(
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(16.0),
-                color: Colors.white,
+                padding: AppConstants.defaultPadding,
+                color: AppConstants.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Explore Recipes',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2E3192),
-                      ),
+                      style: AppConstants.headline1,
                     ),
                     const SizedBox(height: 16),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey[300]!),
+                        color: AppConstants.white,
+                        borderRadius: AppConstants.cardBorderRadius,
+                        border: Border.all(color: AppConstants.grey[300]!),
                       ),
                       child: TextField(
                         controller: _searchController,
                         onChanged: (query) => applyFiltersAndSort(),
                         decoration: InputDecoration(
                           hintText: "What's in your fridge?",
-                          prefixIcon:
-                              Icon(Icons.search, color: Colors.grey[600]),
+                          prefixIcon: Icon(Icons.search,
+                              color: AppConstants.secondaryTextColor),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(12),
                         ),
@@ -465,13 +320,13 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                   : selectedCategory != 'All'
                                       ? 'No $selectedCategory recipes found. Try a different category!'
                                       : 'No recipes found.',
-                              style: const TextStyle(fontSize: 18),
+                              style: AppConstants.bodyText1,
                               textAlign: TextAlign.center,
                             ),
                           )
                         : ListView.builder(
                             controller: _scrollController,
-                            padding: const EdgeInsets.all(16.0),
+                            padding: AppConstants.defaultPadding,
                             itemCount: searchResults.length +
                                 (isLoadingMore ? 1 : 0) +
                                 1,
@@ -493,7 +348,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                                         'Explore More Delights →',
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Color(0xFF2E3192),
+                                          color: AppConstants.primaryColor,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
                                         ),
@@ -519,80 +374,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 24),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_dining, size: 24),
-            label: 'Recipes',
-          ),
-          BottomNavigationBarItem(
-            icon: const SizedBox
-                .shrink(), // Placeholder for custom Contribute icon
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, size: 24),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info, size: 24),
-            label: 'About',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF2E3192),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            _onItemTapped(2);
-          },
-          backgroundColor: const Color(0xFF2E3192),
-          child: const Icon(Icons.add, size: 36, color: Colors.white),
-          elevation: 4.0,
-          shape: const CircleBorder(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIngredientChip(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Chip(
-        avatar: CircleAvatar(
-          backgroundColor: Colors.grey[200],
-          child: Icon(Icons.local_dining, size: 20, color: Colors.grey[600]),
-        ),
-        label: Text(label, style: TextStyle(color: Colors.grey[600])),
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      ),
-    );
-  }
-}
-
-// Placeholder for ProfileScreen
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: const Center(
-        child: Text('Profile Screen Placeholder'),
-      ),
+      bottomNavigationBar: const NavigationWidget(currentIndex: 1),
     );
   }
 }

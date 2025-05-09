@@ -1,23 +1,36 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'routes/router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const GebetaApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GebetaApp extends StatelessWidget {
+  const GebetaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Food Recipe App',
+      title: 'Gebeta App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.grey[100],
+        cardTheme: CardTheme(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 2,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+        ),
       ),
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      initialRoute: AppRouter.home,
+      onGenerateRoute: AppRouter.generateRoute,
     );
   }
 }
