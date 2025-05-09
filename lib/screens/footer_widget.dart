@@ -11,14 +11,10 @@ class FooterWidget extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            '© 2025 Food Recipe App. All rights reserved.',
+            'Gebeta © 2025.',
             style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Contact us: support@foodrecipeapp.com',
-            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-          ),
         ],
       ),
     );
