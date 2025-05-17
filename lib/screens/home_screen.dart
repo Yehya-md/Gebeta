@@ -96,14 +96,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center, // Center content
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   padding: AppConstants.defaultPadding,
                   color: AppConstants.white,
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Center greeting
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         '${_getGreeting()}!',
@@ -198,8 +197,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: recipes.length,
                     itemBuilder: (context, index) {
                       final recipe = recipes[index];
+                      final recipeId = recipe['idMeal'] ?? recipe['_id'] ?? '';
                       final isFav =
-                          FavoritesState().favorites.contains(recipe['idMeal']);
+                          FavoritesState().favorites.contains(recipeId);
+                      final imageUrl =
+                          recipe['strMealThumb'] ?? recipe['image'] ?? '';
+                      final title =
+                          recipe['strMeal'] ?? recipe['title'] ?? 'Unnamed';
+                      final subtitle = recipe['strArea'] ??
+                          recipe['strCategory'] ??
+                          'Habesha';
+
                       return GestureDetector(
                         onTap: () {
                           AppRouter.navigateTo(
@@ -209,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               'recipe': recipe,
                               'isFavorite': isFav,
                               'onFavoriteToggle': () =>
-                                  toggleFavorite(recipe['idMeal']),
+                                  toggleFavorite(recipeId),
                             },
                           );
                         },
@@ -224,10 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.vertical(
+                                  borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(10)),
                                   child: Image.network(
-                                    recipe['strMealThumb'] ?? '',
+                                    imageUrl,
                                     height: 120,
                                     width: 150,
                                     fit: BoxFit.cover,
@@ -244,21 +252,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        recipe['strMeal'] ?? 'Unnamed',
-                                        style: TextStyle(
+                                        title,
+                                        style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      if (recipe['strArea'] != null ||
-                                          recipe['strCategory'] != null)
-                                        Text(
-                                          recipe['strArea'] ??
-                                              recipe['strCategory'] ??
-                                              'Unknown',
-                                          style: AppConstants.bodyText2,
-                                        ),
+                                      Text(
+                                        subtitle,
+                                        style: AppConstants.bodyText2,
+                                      ),
                                     ],
                                   ),
                                 ),
