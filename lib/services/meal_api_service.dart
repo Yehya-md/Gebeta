@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class MealApiService {
   static const String _baseUrl = 'https://www.themealdb.com/api/json/v1/1';
-  static const String _habeshaUrl = 'http://localhost:3000/habesha-recipes';
+  static const String _habeshaUrl = 'http://127.0.0.1:3000/api/recipes';
 
   Future<List<dynamic>> fetchFeaturedRecipes() async {
     try {
@@ -24,7 +24,13 @@ class MealApiService {
       final response = await http.get(Uri.parse(_habeshaUrl));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['meals']?.where((meal) => meal != null).toList() ?? [];
+        if (data is List) {
+          print(data);
+          return data;
+        } else {
+          print('Unexpected data format: $data');
+          return [];
+        }
       }
       return [];
     } catch (e) {
