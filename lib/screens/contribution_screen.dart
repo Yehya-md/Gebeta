@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../constants/constants.dart';
 import '../widgets/navigation_widget.dart';
 
@@ -14,26 +16,71 @@ class _ContributionScreenState extends State<ContributionScreen> {
   final _recipeNameController = TextEditingController();
   final _ingredientsController = TextEditingController();
   final _instructionsController = TextEditingController();
+  final _imageUrlController = TextEditingController();
 
   @override
   void dispose() {
     _recipeNameController.dispose();
     _ingredientsController.dispose();
     _instructionsController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
-  void _submitRecipe() {
+  Future<void> _submitRecipe() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Recipe submitted! Thank you for your contribution.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      _recipeNameController.clear();
-      _ingredientsController.clear();
-      _instructionsController.clear();
+      final ingredientsList = _ingredientsController.text
+          .split('\n')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      final payload = {
+        'title': _recipeNameController.text,
+        'ingredients': ingredientsList,
+        'instructions': _instructionsController.text,
+        'image':
+            _imageUrlController.text.isNotEmpty ? _imageUrlController.text : '',
+      };
+
+      try {
+        final response = await http.post(
+          Uri.parse('http://127.0.0.1:3000/api/food-reviews'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(payload),
+        );
+
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Recipe submitted successfully!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          _recipeNameController.clear();
+          _ingredientsController.clear();
+          _instructionsController.clear();
+          _imageUrlController.clear();
+        } else {
+          final errorMessage = jsonDecode(response.body)['error'] ??
+              'Failed to complete the requested action.';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -123,6 +170,32 @@ class _ContributionScreenState extends State<ContributionScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the instructions';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _imageUrlController,
+                  decoration: InputDecoration(
+                    labelText: 'Image URL (optional)',
+                    labelStyle: TextStyle(color: AppConstants.primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: AppConstants.cardBorderRadius,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppConstants.cardBorderRadius,
+                      borderSide: BorderSide(color: AppConstants.primaryColor),
+                    ),
+                  ),
+                  keyboardType: TextInputType.url,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final urlPattern =
+                          RegExp(r'^(https?:\/\/[^\s$.?#].[^\s]*)$');
+                      if (!urlPattern.hasMatch(value)) {
+                        return 'Please enter a valid URL';
+                      }
                     }
                     return null;
                   },
