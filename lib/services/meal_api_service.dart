@@ -24,13 +24,7 @@ class MealApiService {
       final response = await http.get(Uri.parse(_habeshaUrl));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data is List) {
-          print(data);
-          return data;
-        } else {
-          print('Unexpected data format: $data');
-          return [];
-        }
+        return data['meals']?.where((meal) => meal != null).toList() ?? [];
       }
       return [];
     } catch (e) {
