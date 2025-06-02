@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:food_recipe/screens/search_screen.dart';
+import 'package:food_recipe/screens/setting_screen.dart';
 import '../screens/about_screen.dart';
 import '../screens/contribution_screen.dart';
 import '../screens/favorites_screen.dart';
@@ -15,6 +17,8 @@ class AppRouter {
   static const String feedback = '/feedback';
   static const String recipeDetails = '/recipe-details';
   static const String about = '/about';
+  static const String search = '/search';
+  static const String settingsButton = '/settings';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -41,6 +45,8 @@ class AppRouter {
         );
       case feedback:
         return MaterialPageRoute(builder: (_) => const FeedbackScreen());
+      case search:
+        return MaterialPageRoute(builder: (_) => const SearchScreen());
       case recipeDetails:
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -52,6 +58,8 @@ class AppRouter {
         );
       case about:
         return MaterialPageRoute(builder: (_) => const AboutScreen());
+      case settingsButton:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

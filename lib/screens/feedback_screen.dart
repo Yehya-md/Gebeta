@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../constants/constants.dart';
 import '../widgets/navigation_widget.dart';
 
@@ -20,18 +22,45 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     super.dispose();
   }
 
-  void _submitFeedback() {
+  Future<void> _submitFeedback() async {
     if (_formKey.currentState!.validate() && _rating > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Feedback submitted! Thank you.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      _feedbackController.clear();
-      setState(() {
-        _rating = 0;
-      });
+      try {
+        final response = await http.post(
+          Uri.parse('http://localhost:3000/api/feedback'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'rating': _rating,
+            'feedback': _feedbackController.text,
+          }),
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Feedback submitted! Thank you.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          _feedbackController.clear();
+          setState(() {
+            _rating = 0;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Failed to submit feedback: ${response.statusCode}'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error submitting feedback: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     } else if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
