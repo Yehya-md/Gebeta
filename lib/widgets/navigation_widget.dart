@@ -26,13 +26,7 @@ class NavigationWidget extends StatelessWidget {
         AppRouter.navigateTo(context, AppRouter.recipes, replace: true);
         break;
       case 3:
-        AppRouter.navigateTo(context, AppRouter.favorites,
-            replace: true,
-            arguments: {
-              'favorites': <String>{},
-              'allRecipes': <dynamic>[],
-              'onToggleFavorite': (String? id) {},
-            });
+        AppRouter.navigateTo(context, AppRouter.search, replace: true);
         break;
       case 4:
         AppRouter.navigateTo(
@@ -62,8 +56,8 @@ class NavigationWidget extends StatelessWidget {
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.favorite, size: AppConstants.iconSize),
-              label: 'Favorites',
+              icon: Icon(Icons.search, size: AppConstants.iconSize),
+              label: 'search',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.info, size: AppConstants.iconSize),
