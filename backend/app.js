@@ -32,6 +32,13 @@ const recipeSchema = new mongoose.Schema({
 
 const Recipe = mongoose.model("Recipe", recipeSchema);
 
+const FeedbackSchema = new mongoose.Schema({
+  rating: { type: Number, required: true },
+  feedback: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+const Feedback = mongoose.model("Feedback", FeedbackSchema);
+
 app.get("/api/recipes", (req, res) => {
   Recipe.find()
     .then((recipes) => {
@@ -167,6 +174,32 @@ app.post("/api/food-reviews/:id/accept", (req, res) => {
     .catch((err) => {
       console.error("Error accepting food review:", err);
       res.status(500).json({ error: "Failed to accept food review" });
+    });
+});
+
+//POST : user feedback handling
+app.post("/api/feedback", (req, res) => {
+  const body = req.body;
+  console.log("Feedback received:", body);
+  const { rating, feedback } = req.body;
+
+  // Validate request body
+  if (!rating || !feedback) {
+    return res.status(400).json({ error: "Rating and feedback are required" });
+  }
+
+  console.log("Feedback received:", { rating, feedback });
+
+  // Save feedback to database
+  const newFeedback = new Feedback({ rating, feedback });
+  newFeedback
+    .save()
+    .then(() => {
+      res.status(201).json({ message: "Feedback submitted successfully" });
+    })
+    .catch((err) => {
+      console.error("Error saving feedback:", err);
+      res.status(500).json({ error: "Failed to submit feedback" });
     });
 });
 
