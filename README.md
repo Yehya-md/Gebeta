@@ -26,7 +26,8 @@ samples, guidance on mobile development, and a full API reference.
 <h1>side navbar</h1>
 <img width="197" alt="image" src="https://github.com/user-attachments/assets/e85bcc76-da4d-4e4e-a506-4f62c55de573" />
 <h1>contiribution page</h1>
-![image](https://github.com/user-attachments/assets/cd1511b8-ebf1-477b-b385-f4affef93b51)
+<img width="226" alt="image" src="https://github.com/user-attachments/assets/7545ec30-1416-45d5-90cb-033122ae8d8a" />
+
 
 
 
