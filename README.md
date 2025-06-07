@@ -25,6 +25,12 @@ A new Flutter project.
 <img width="226" alt="image" src="https://github.com/user-attachments/assets/7545ec30-1416-45d5-90cb-033122ae8d8a" />
 <h1>feedback</h1>
 <img width="199" alt="image" src="https://github.com/user-attachments/assets/f5372fce-8b6d-40db-9c93-093027b0cb26" />
+<h1>international food search</h1>
+<img width="206" alt="image" src="https://github.com/user-attachments/assets/03d1395a-524f-4ac3-8d94-29326d04996c" />
+<h1>about us</h1>
+<img width="197" alt="image" src="https://github.com/user-attachments/assets/bd1ab2cf-004f-4e56-8c64-30baee2bf111" />
+
+
 
 
 
