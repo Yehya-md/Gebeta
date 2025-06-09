@@ -11,6 +11,12 @@ A new Flutter project.
 <p>bash--- nodemon app.js</p>
 <P>after this run the fluter project </P>
 
+<h1>Features</h1>
+<li>hprizontal scroll to view more foods</li>
+<li>user contribution to add their recipes for approvement</li>
+<li>user can send feedback about food</li>
+<li>see recipe details</li>
+
 <h1>home screen</h1>
 
 
@@ -30,6 +36,11 @@ A new Flutter project.
 <h1>about us</h1>
 <img width="197" alt="image" src="https://github.com/user-attachments/assets/bd1ab2cf-004f-4e56-8c64-30baee2bf111" />
 
+<h1>Group Members</h1>
+<pre>name                     id</pre>
+<p>Nuredin fentaw...........4330/14</p>
+<p>Yehya Muhammed...........4300/14</p>
+<p>Fuad Abdela..............4345/14</p>
 
 
 
